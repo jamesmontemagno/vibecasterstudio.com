@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="oklch(0.614 0.234 28.2)">
+    <meta name="color-scheme" content="light">
+    <title>VibeCaster Studio — Remote recording that keeps the take</title>
+    <meta
+      name="description"
+      content="VibeCaster Studio is a browser-based remote podcast studio with local isolated recording, resilient cloud backup, and flexible audio and video exports."
+    >
+    <link rel="canonical" href="https://vibecasterstudio.com/">
+    <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="VibeCaster Studio">
+    <meta property="og:title" content="Remote recording that keeps the take">
+    <meta
+      property="og:description"
+      content="Studio-quality local recording, resilient backup, and flexible exports—coming soon to the browser."
+    >
+    <meta property="og:url" content="https://vibecasterstudio.com/">
+    <meta property="og:image" content="https://vibecasterstudio.com/assets/social-card.png">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="VibeCaster Studio signal paths connecting local recordings to resilient backup and finished exports">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="VibeCaster Studio — Remote recording that keeps the take">
+    <meta
+      name="twitter:description"
+      content="A browser-based remote podcast studio built to keep recording through weak connections and crashes."
+    >
+    <meta name="twitter:image" content="https://vibecasterstudio.com/assets/social-card.png">
+
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+
+    <header class="site-header">
+      <div class="shell header-inner">
+        <a class="brand" href="/" aria-label="VibeCaster Studio home">
+          <svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true">
+            <circle cx="20" cy="20" r="18" fill="currentColor"/>
+            <path d="M12 17.5v5M17 13v14M22 16v8M27 11v18" fill="none" stroke="white" stroke-width="3.25" stroke-linecap="round"/>
+          </svg>
+          <span>VibeCaster <strong>Studio</strong></span>
+        </a>
+        <span class="status-note"><span aria-hidden="true"></span> In the studio</span>
+      </div>
+    </header>
+
+    <main id="main-content">
+      <section class="hero shell" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="hero-kicker">Remote podcast recording, rethought</p>
+          <h1 id="hero-title">Record like the connection can't be trusted.</h1>
+          <p class="hero-intro">
+            VibeCaster Studio captures every voice and camera locally, backs up continuously, and turns isolated tracks into a polished episode—right in the browser.
+          </p>
+          <div class="promise-line" aria-label="Product summary">
+            <span>Easy for guests</span>
+            <span>Protective of every take</span>
+            <span>Flexible at export</span>
+          </div>
+        </div>
+
+        <figure class="signal-stage">
+          <svg class="signal-map" viewBox="0 0 760 640" role="img" aria-labelledby="signal-title signal-desc">
+            <title id="signal-title">A recording moving safely from guests to finished episode</title>
+            <desc id="signal-desc">
+              Four participant signals become isolated local tracks, copy continuously to resumable backup, and finish as landscape and vertical episode layouts.
+            </desc>
+
+            <rect class="stage-bg" x="18" y="18" width="724" height="604" rx="62"/>
+            <path class="stage-doodle" d="M74 176c34-65 82-90 146-103M623 509c39-13 65-40 76-82" pathLength="1"/>
+            <circle class="stage-dot stage-dot-a" cx="666" cy="94" r="9"/>
+            <circle class="stage-dot stage-dot-b" cx="89" cy="526" r="6"/>
+
+            <g class="participant participant-host" transform="translate(70 86)">
+              <circle class="participant-ring" cx="72" cy="72" r="64"/>
+              <circle class="participant-face host-face" cx="72" cy="72" r="52"/>
+              <path class="participant-hair" d="M34 70c4-35 20-54 50-51 25 3 36 23 31 54-15-11-26-22-34-34-14 17-29 27-47 31Z"/>
+              <circle class="participant-eye" cx="56" cy="76" r="4"/>
+              <circle class="participant-eye" cx="86" cy="76" r="4"/>
+              <path class="participant-mouth" d="M57 93c10 8 20 8 30 0"/>
+              <rect class="participant-label" x="19" y="129" width="106" height="34" rx="17"/>
+              <text x="72" y="151" text-anchor="middle">HOST</text>
+            </g>
+
+            <g class="participant participant-one" transform="translate(547 70)">
+              <circle class="participant-ring" cx="66" cy="66" r="58"/>
+              <circle class="participant-face guest-one-face" cx="66" cy="66" r="47"/>
+              <path class="participant-hair" d="M30 62c3-30 19-45 41-44 26 1 38 18 36 49-20-3-37-13-52-30-6 12-14 20-25 25Z"/>
+              <circle class="participant-eye" cx="51" cy="69" r="3.5"/>
+              <circle class="participant-eye" cx="79" cy="69" r="3.5"/>
+              <path class="participant-mouth" d="M52 86c9 7 18 7 27 0"/>
+              <rect class="participant-label guest-label" x="10" y="117" width="112" height="34" rx="17"/>
+              <text x="66" y="139" text-anchor="middle">GUEST</text>
+            </g>
+
+            <g class="participant participant-two" transform="translate(56 424)">
+              <circle class="participant-ring" cx="62" cy="62" r="54"/>
+              <circle class="participant-face guest-two-face" cx="62" cy="62" r="44"/>
+              <path class="participant-hair" d="M29 62c2-29 15-44 39-44 23 0 34 17 32 47-12-2-24-9-37-23-9 12-20 19-34 20Z"/>
+              <circle class="participant-eye" cx="48" cy="67" r="3.5"/>
+              <circle class="participant-eye" cx="75" cy="67" r="3.5"/>
+              <path class="participant-mouth" d="M49 83c8 6 17 6 25 0"/>
+              <rect class="participant-label guest-label" x="6" y="108" width="112" height="34" rx="17"/>
+              <text x="62" y="130" text-anchor="middle">GUEST</text>
+            </g>
+
+            <g class="participant participant-three" transform="translate(564 432)">
+              <circle class="participant-ring" cx="57" cy="57" r="50"/>
+              <circle class="participant-face guest-three-face" cx="57" cy="57" r="41"/>
+              <path class="participant-hair" d="M26 54c2-26 15-39 36-37 21 1 31 17 28 42-14-2-25-9-34-20-8 8-18 13-30 15Z"/>
+              <circle class="participant-eye" cx="45" cy="62" r="3.5"/>
+              <circle class="participant-eye" cx="70" cy="62" r="3.5"/>
+              <path class="participant-mouth" d="M45 77c8 6 16 6 24 0"/>
+              <rect class="participant-label guest-label" x="1" y="99" width="112" height="34" rx="17"/>
+              <text x="57" y="121" text-anchor="middle">GUEST</text>
+            </g>
+
+            <g class="signal-lines" aria-hidden="true">
+              <path d="M189 170C267 182 258 243 315 265"/>
+              <path d="M562 177C494 185 510 244 449 268"/>
+              <path d="M166 468C247 450 249 389 315 364"/>
+              <path d="M572 467C495 449 510 389 451 366"/>
+            </g>
+
+            <g class="capture-core" transform="translate(270 228)">
+              <circle class="core-shadow" cx="112" cy="91" r="110"/>
+              <circle class="core-disc" cx="112" cy="91" r="96"/>
+              <circle class="core-groove" cx="112" cy="91" r="67"/>
+              <circle class="core-center" cx="112" cy="91" r="20"/>
+              <g class="waveform" transform="translate(58 67)" aria-hidden="true">
+                <rect x="0" y="18" width="8" height="22" rx="4"/>
+                <rect x="17" y="8" width="8" height="42" rx="4"/>
+                <rect x="34" y="0" width="8" height="58" rx="4"/>
+                <rect x="51" y="12" width="8" height="34" rx="4"/>
+                <rect x="68" y="4" width="8" height="50" rx="4"/>
+                <rect x="85" y="15" width="8" height="28" rx="4"/>
+                <rect x="102" y="20" width="8" height="18" rx="4"/>
+              </g>
+              <rect class="core-label" x="49" y="154" width="126" height="36" rx="18"/>
+              <text class="core-label-text" x="112" y="178" text-anchor="middle">LOCAL TRACKS</text>
+            </g>
+
+            <g class="backup-path" aria-hidden="true">
+              <path class="backup-line" d="M432 345C489 351 491 332 525 332"/>
+              <circle class="backup-packet" cx="0" cy="0" r="7"/>
+            </g>
+
+            <g class="backup-node" transform="translate(498 272)">
+              <path class="cloud" d="M42 100h92c25 0 42-14 42-35 0-19-14-33-33-35C136 10 121 0 101 0 77 0 60 14 54 34 29 34 10 49 10 70c0 18 13 30 32 30Z"/>
+              <path class="backup-check" d="m72 58 18 17 34-38"/>
+              <text x="93" y="126" text-anchor="middle">RESUMABLE</text>
+              <text x="93" y="145" text-anchor="middle">BACKUP</text>
+            </g>
+
+            <g class="output-path" aria-hidden="true">
+              <path d="M431 389C482 414 477 502 522 518"/>
+            </g>
+
+            <g class="export-frames" transform="translate(435 451)">
+              <rect class="landscape-frame" x="0" y="0" width="132" height="80" rx="12"/>
+              <rect class="frame-person frame-person-a" x="10" y="10" width="52" height="60" rx="8"/>
+              <rect class="frame-person frame-person-b" x="70" y="10" width="52" height="60" rx="8"/>
+              <rect class="vertical-frame" x="146" y="-20" width="62" height="110" rx="12"/>
+              <circle class="vertical-person-a" cx="177" cy="19" r="20"/>
+              <circle class="vertical-person-b" cx="177" cy="63" r="17"/>
+              <text x="104" y="116" text-anchor="middle">EXPORT YOUR WAY</text>
+            </g>
+          </svg>
+          <figcaption>
+            Every participant records close to the source. Backup catches up continuously. Your episode leaves as flexible, isolated tracks.
+          </figcaption>
+        </figure>
+      </section>
+
+      <section class="proof-section" aria-labelledby="proof-title">
+        <div class="shell proof-inner">
+          <div>
+            <p class="section-note">A safer way to capture the room</p>
+            <h2 id="proof-title">The take doesn't live on the call.</h2>
+          </div>
+          <p>
+            Live conversation can cross the internet. Recording quality doesn't have to. VibeCaster Studio keeps high-quality capture with each participant, then protects it as the session unfolds.
+          </p>
+        </div>
+      </section>
+
+      <section class="process-section shell" aria-labelledby="process-title">
+        <div class="section-heading">
+          <p class="section-note">From hello to final cut</p>
+          <h2 id="process-title">One room. Every episode.</h2>
+          <p>Create a familiar place for the show, bring guests in without an account, and let the studio carry the recording from setup through export.</p>
+        </div>
+
+        <ol class="process-list">
+          <li>
+            <span class="step-number" aria-hidden="true">1</span>
+            <div>
+              <h3>Open the room</h3>
+              <p>Reuse the same studio across episodes. A secure link brings each guest straight to microphone, speaker, and camera preflight.</p>
+            </div>
+            <svg viewBox="0 0 160 72" aria-hidden="true">
+              <rect x="12" y="13" width="136" height="46" rx="23"/>
+              <circle cx="43" cy="36" r="14"/>
+              <path d="M37 36h12M43 30v12M69 29h58M69 43h38"/>
+            </svg>
+          </li>
+          <li>
+            <span class="step-number" aria-hidden="true">2</span>
+            <div>
+              <h3>Keep the good take close</h3>
+              <p>Audio and video are captured locally as isolated tracks while resumable backup keeps making a safe copy in the cloud.</p>
+            </div>
+            <svg viewBox="0 0 160 72" aria-hidden="true">
+              <circle cx="49" cy="36" r="25"/>
+              <path d="M38 36h5l5-14 8 28 7-21 6 7h11"/>
+              <path d="M93 45h41c11 0 17-6 17-15s-7-15-16-15c-4-8-11-12-20-12-12 0-20 7-23 17-9 0-16 6-16 14"/>
+              <path d="m107 30 8 8 15-17"/>
+            </svg>
+          </li>
+          <li>
+            <span class="step-number" aria-hidden="true">3</span>
+            <div>
+              <h3>Shape the episode</h3>
+              <p>Download every isolated track or create a browser-first mix with a custom static layout for landscape or vertical viewing.</p>
+            </div>
+            <svg viewBox="0 0 160 72" aria-hidden="true">
+              <rect x="8" y="17" width="90" height="50" rx="8"/>
+              <rect x="17" y="26" width="32" height="32" rx="5"/>
+              <rect x="57" y="26" width="32" height="32" rx="5"/>
+              <rect x="111" y="5" width="40" height="62" rx="8"/>
+              <circle cx="131" cy="26" r="12"/>
+              <circle cx="131" cy="49" r="9"/>
+            </svg>
+          </li>
+        </ol>
+      </section>
+
+      <section class="capabilities-section" aria-labelledby="capabilities-title">
+        <div class="shell capabilities-layout">
+          <div class="capabilities-intro">
+            <p class="section-note">Built around the conversation</p>
+            <h2 id="capabilities-title">Less monitoring. More making.</h2>
+            <p>
+              VibeCaster Studio handles the fragile parts in the background, so hosts can stay present and guests can simply show up.
+            </p>
+            <div class="recording-object" aria-hidden="true">
+              <span></span><span></span><span></span><span></span><span></span>
+            </div>
+          </div>
+
+          <div class="capability-list">
+            <article>
+              <p class="capability-tag">Arrival</p>
+              <h3>Guests join without joining anything.</h3>
+              <p>A secure room link and a clear preflight help people arrive ready—no guest account, no mystery about which microphone is live.</p>
+            </article>
+            <article>
+              <p class="capability-tag">Recovery</p>
+              <h3>A dropped connection doesn't get the last word.</h3>
+              <p>Local capture preserves quality while continuous resumable backup is designed to help recover from weak connections and interruptions.</p>
+            </article>
+            <article>
+              <p class="capability-tag">Control</p>
+              <h3>Keep every voice separate. Finish together.</h3>
+              <p>Download isolated tracks for full control, or create mixed audio and composited video exports in the browser.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="layouts-section shell" aria-labelledby="layouts-title">
+        <div class="layouts-copy">
+          <p class="section-note">Made for wherever the episode lands</p>
+          <h2 id="layouts-title">The same conversation, framed for the feed.</h2>
+          <p>Compose a static custom layout once, then carry it into a wide episode or a vertical cut without turning recording into an editing suite.</p>
+        </div>
+
+        <div class="layout-showcase" aria-label="Examples of landscape and vertical episode layouts">
+          <div class="landscape-example">
+            <div class="example-topbar"><span></span><span></span><span></span></div>
+            <div class="example-guest guest-warm">
+              <span class="mini-face"></span>
+              <b>Host</b>
+            </div>
+            <div class="example-guest guest-cool">
+              <span class="mini-face"></span>
+              <b>Guest</b>
+            </div>
+            <div class="example-wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          </div>
+          <div class="vertical-example">
+            <div class="vertical-title">THE GOOD TAKE</div>
+            <div class="vertical-guest guest-warm"><span class="mini-face"></span></div>
+            <div class="vertical-guest guest-cool"><span class="mini-face"></span></div>
+            <div class="vertical-wave" aria-hidden="true"></div>
+          </div>
+          <p class="layout-caption landscape-caption">Landscape episode</p>
+          <p class="layout-caption vertical-caption">Vertical cut</p>
+        </div>
+      </section>
+
+      <section class="closing-section" aria-labelledby="closing-title">
+        <div class="shell closing-inner">
+          <svg viewBox="0 0 120 120" aria-hidden="true">
+            <circle cx="60" cy="60" r="52"/>
+            <path d="M31 61h11l8-24 13 47 12-38 9 15h7"/>
+          </svg>
+          <div>
+            <p class="section-note">VibeCaster Studio is coming soon</p>
+            <h2 id="closing-title">Built for the moment when the conversation is too good to lose.</h2>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="shell footer-inner">
+        <p><strong>VibeCaster Studio</strong> <span>Remote recording that keeps the take.</span></p>
+        <p>Coming soon.</p>
+      </div>
+    </footer>
+  </body>
+</html>
