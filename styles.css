@@ -271,8 +271,6 @@ svg {
 
 .participant {
   animation: participant-arrive 0.75s var(--ease-out) both;
-  transform-box: fill-box;
-  transform-origin: center;
 }
 
 .participant-one {
@@ -451,8 +449,6 @@ svg {
 
 .export-frames {
   animation: export-settle 0.9s 0.45s var(--ease-out) both;
-  transform-box: fill-box;
-  transform-origin: center;
 }
 
 .landscape-frame,
@@ -941,22 +937,22 @@ svg {
 @keyframes participant-arrive {
   from {
     opacity: 0;
-    transform: scale(0.82) rotate(-4deg);
+    filter: blur(0.5rem);
   }
   to {
     opacity: 1;
-    transform: scale(1) rotate(0);
+    filter: blur(0);
   }
 }
 
 @keyframes export-settle {
   from {
     opacity: 0;
-    transform: translateY(1rem) rotate(4deg);
+    filter: blur(0.4rem);
   }
   to {
     opacity: 1;
-    transform: translateY(0) rotate(0);
+    filter: blur(0);
   }
 }
 
