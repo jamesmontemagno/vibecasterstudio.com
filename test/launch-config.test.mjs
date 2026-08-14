@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
+import { parse as parseJavaScript } from "acorn";
+import { parse as parseHtml } from "parse5";
 import { isCanonicalUtcRfc3339, launchConfig } from "../launch-config.js";
 
 test("the committed launch configuration fails closed", () => {
@@ -29,28 +31,120 @@ test("normalized, date-only, and non-UTC verification timestamps are rejected", 
   }
 });
 
-function assertPermittedUrlAttributes(page) {
-  const urlAttributes = [...page.matchAll(/\b(href|src|action)\s*=\s*(["'])(.*?)\2/gi)].map(([, name, , value]) => ({
-    name: name.toLowerCase(),
-    value,
-  }));
+const URL_ATTRIBUTES = new Set([
+  "action",
+  "background",
+  "cite",
+  "data",
+  "formaction",
+  "href",
+  "longdesc",
+  "manifest",
+  "ping",
+  "poster",
+  "profile",
+  "src",
+  "srcset",
+  "xlink:href",
+]);
 
-  for (const { name, value } of urlAttributes) {
-    if (name === "href") {
-      assert.ok(value === "styles.css" || value.startsWith("#"), `unapproved href: ${value}`);
-      continue;
-    }
-
-    assert.equal(name, "src");
-    assert.equal(value, "script.js");
+function walkHtml(node, visit) {
+  visit(node);
+  for (const child of node.childNodes ?? []) {
+    walkHtml(child, visit);
   }
 }
 
+function assertPermittedHtml(page) {
+  const document = parseHtml(page);
+
+  walkHtml(document, (node) => {
+    if (!node.tagName) {
+      return;
+    }
+
+    const tagName = node.tagName.toLowerCase();
+    const attributes = new Map((node.attrs ?? []).map(({ name, value }) => [name.toLowerCase(), value]));
+
+    assert.notEqual(tagName, "base", "base elements can redirect otherwise local links");
+    assert.notEqual(tagName, "form", "the static site must not create forms");
+
+    if (tagName === "script") {
+      assert.equal(attributes.get("src"), "script.js", "only the local application script is allowed");
+    }
+
+    if (tagName === "meta" && attributes.get("http-equiv")?.toLowerCase() === "refresh") {
+      assert.fail("meta refresh is navigation");
+    }
+
+    for (const [name, value] of attributes) {
+      assert.equal(name.startsWith("on"), false, `inline event handler is not allowed: ${name}`);
+
+      if (!URL_ATTRIBUTES.has(name)) {
+        continue;
+      }
+
+      if (name === "href" && (value === "styles.css" || value.startsWith("#"))) {
+        continue;
+      }
+
+      if (name === "src" && value === "script.js") {
+        continue;
+      }
+
+      assert.fail(`unapproved ${name}: ${value}`);
+    }
+  });
+}
+
+function walkJavaScript(node, visit) {
+  if (!node || typeof node !== "object") {
+    return;
+  }
+
+  visit(node);
+  for (const value of Object.values(node)) {
+    if (Array.isArray(value)) {
+      value.forEach((child) => walkJavaScript(child, visit));
+    } else if (value?.type) {
+      walkJavaScript(value, visit);
+    }
+  }
+}
+
+function memberPropertyName(node) {
+  if (!node.computed && node.property.type === "Identifier") {
+    return node.property.name;
+  }
+
+  return node.computed && node.property.type === "Literal" && typeof node.property.value === "string"
+    ? node.property.value
+    : null;
+}
+
 function assertNoClientNavigation(executableAssets) {
-  assert.doesNotMatch(
-    executableAssets,
-    /(?:window\s*\.\s*|window\s*\[\s*["'])?location(?:\s*\.\s*\w+|\s*\[\s*["']\w+["']\s*\])?|history\s*\.\s*(?:pushState|replaceState)|document\s*\.\s*createElement\s*\(|(?:\.\s*href|\[\s*["']href["']\s*\])\s*=|\.setAttribute\s*\(\s*["'](?:href|src|action)["']/i,
-  );
+  const program = parseJavaScript(executableAssets, { ecmaVersion: "latest", sourceType: "module" });
+
+  walkJavaScript(program, (node) => {
+    if (node.type === "CallExpression" && node.callee.type === "MemberExpression") {
+      const property = memberPropertyName(node.callee);
+      assert.equal(node.callee.computed, false, "computed method calls are not allowed in served scripts");
+
+      if (property === "setAttribute") {
+        assert.equal(node.arguments[0]?.type, "Literal");
+        assert.equal(node.arguments[0]?.value, "aria-pressed");
+        return;
+      }
+
+      assert.equal(["assign", "createElement", "replace", "requestSubmit", "submit"].includes(property), false);
+    }
+
+    if (node.type === "AssignmentExpression" && node.left.type === "MemberExpression") {
+      const property = memberPropertyName(node.left);
+      assert.equal(node.left.computed, false, "computed property assignments are not allowed in served scripts");
+      assert.equal(["action", "formAction", "href", "location", "src"].includes(property), false);
+    }
+  });
 }
 
 function assertNoUnapprovedDestinations(servedAssets) {
@@ -58,10 +152,8 @@ function assertNoUnapprovedDestinations(servedAssets) {
 }
 
 function assertNoUnapprovedStylesheetDestinations(stylesheet) {
-  assert.doesNotMatch(
-    stylesheet,
-    /@import\s+(?:url\(\s*)?["']?(?:https?:)?\/\/|url\(\s*["']?(?:https?:)?\/\/|tally\.so|plausible|google-analytics|googletagmanager/i,
-  );
+  assert.doesNotMatch(stylesheet, /@import|url\s*\(|\\/i);
+  assertNoUnapprovedDestinations(stylesheet);
 }
 
 test("served assets have no enrollment provider, sign-in route, tracking, or launch claims", async () => {
@@ -70,7 +162,7 @@ test("served assets have no enrollment provider, sign-in route, tracking, or lau
   );
   const servedAssets = `${page}\n${script}\n${config}\n${stylesheet}`;
 
-  assertPermittedUrlAttributes(page);
+  assertPermittedHtml(page);
   assertNoClientNavigation(`${script}\n${config}`);
   assertNoUnapprovedDestinations(servedAssets);
   assertNoUnapprovedStylesheetDestinations(stylesheet);
@@ -85,9 +177,14 @@ test("served assets have no enrollment provider, sign-in route, tracking, or lau
 test("the static asset gate rejects relative sign-in links and alternate trackers", async () => {
   const page = await readFile(new URL("../index.html", import.meta.url), "utf8");
 
-  assert.throws(() => assertPermittedUrlAttributes(`${page}<a href = "/sign-in">Sign in</a>`));
+  assert.throws(() => assertPermittedHtml(`${page}<a href = "/sign-in">Sign in</a>`));
+  assert.throws(() => assertPermittedHtml(`${page}<form action=/sign-in></form>`));
+  assert.throws(() => assertPermittedHtml(`${page}<button formaction="/sign-in">Sign in</button>`));
   assert.throws(() => assertNoUnapprovedDestinations('<script src="https://plausible.io/js/script.js"></script>'));
-  assert.throws(() => assertNoClientNavigation('const tagName = "a"; document.createElement(tagName); link.href = "/sign-in";'));
+  assert.throws(() => assertNoClientNavigation('document["createElement"]("form");'));
+  assert.throws(() => assertNoClientNavigation('form["action"] = "/sign-in";'));
+  assert.throws(() => assertNoClientNavigation("form.submit();"));
   assert.throws(() => assertNoUnapprovedStylesheetDestinations('@import url("https://plausible.io/css/site.css");'));
   assert.throws(() => assertNoUnapprovedStylesheetDestinations('.promo { background: url(//tracker.example/pixel.gif); }'));
+  assert.throws(() => assertNoUnapprovedStylesheetDestinations("@import url(\\2f \\2f tracker.example/pixel.css);"));
 });
