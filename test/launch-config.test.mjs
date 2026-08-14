@@ -73,7 +73,7 @@ function walkHtml(node, visit) {
   }
 }
 
-function assertPermittedHtml(page) {
+function assertPermittedHtml(page, { allowedHrefs = [] } = {}) {
   const document = parseHtml(page);
 
   walkHtml(document, (node) => {
@@ -107,7 +107,7 @@ function assertPermittedHtml(page) {
         continue;
       }
 
-      if (name === "href" && (value === "styles.css" || value.startsWith("#"))) {
+      if (name === "href" && (value === "styles.css" || value.startsWith("#") || allowedHrefs.includes(value))) {
         continue;
       }
 
@@ -118,6 +118,111 @@ function assertPermittedHtml(page) {
       assert.fail(`unapproved ${name}: ${value}`);
     }
   });
+}
+
+function getAttribute(node, name) {
+  return node.attrs?.find((attribute) => attribute.name.toLowerCase() === name)?.value;
+}
+
+function getText(node) {
+  if (node.nodeName === "#text") {
+    return node.value;
+  }
+
+  return (node.childNodes ?? []).map(getText).join("");
+}
+
+function findElements(document, tagName) {
+  const elements = [];
+
+  walkHtml(document, (node) => {
+    if (node.tagName && (tagName === "*" || node.tagName.toLowerCase() === tagName)) {
+      elements.push(node);
+    }
+  });
+
+  return elements;
+}
+
+function assertAccessibleDocument(page, { requiresFigure = false } = {}) {
+  const document = parseHtml(page);
+  const [html] = findElements(document, "html");
+  const titles = findElements(document, "title");
+  const descriptions = findElements(document, "meta").filter((node) => getAttribute(node, "name") === "description");
+  const mains = findElements(document, "main");
+  const headings = ["h1", "h2", "h3", "h4", "h5", "h6"].flatMap((tagName) => findElements(document, tagName));
+  const ids = new Set();
+
+  assert.equal(getAttribute(html, "lang"), "en", "the document language must be declared");
+  assert.equal(titles.length, 1, "each page needs one title");
+  assert.notEqual(getText(titles[0]).trim(), "", "the title must not be empty");
+  assert.equal(descriptions.length, 1, "each page needs one meta description");
+  assert.notEqual(getAttribute(descriptions[0], "content")?.trim(), "", "the meta description must not be empty");
+  assert.equal(mains.length, 1, "each page needs one main landmark");
+  assert.equal(findElements(document, "h1").length, 1, "each page needs one h1");
+
+  for (const node of findElements(document, "*")) {
+    const id = getAttribute(node, "id");
+
+    if (id) {
+      assert.equal(ids.has(id), false, `duplicate id: ${id}`);
+      ids.add(id);
+    }
+  }
+
+  for (const anchor of findElements(document, "a")) {
+    const href = getAttribute(anchor, "href");
+
+    if (href?.startsWith("#")) {
+      assert.equal(ids.has(href.slice(1)), true, `fragment target is missing: ${href}`);
+    }
+
+    assert.notEqual(
+      `${getText(anchor)} ${getAttribute(anchor, "aria-label") ?? ""}`.trim(),
+      "",
+      "links need an accessible name",
+    );
+  }
+
+  for (const button of findElements(document, "button")) {
+    assert.notEqual(
+      `${getText(button)} ${getAttribute(button, "aria-label") ?? ""}`.trim(),
+      "",
+      "buttons need an accessible name",
+    );
+  }
+
+  const headingLevels = headings.map((heading) => Number(heading.tagName.slice(1)));
+
+  for (let index = 1; index < headingLevels.length; index += 1) {
+    assert.ok(headingLevels[index] <= headingLevels[index - 1] + 1, "heading levels must not skip");
+  }
+
+  if (requiresFigure) {
+    const figures = findElements(document, "figure");
+
+    assert.equal(figures.length, 1, "the illustrative session must be a figure");
+    assert.equal(getAttribute(figures[0], "aria-label"), undefined, "the figure caption supplies the context");
+    assert.equal(
+      figures[0].childNodes?.some((node) => node.tagName === "figcaption"),
+      true,
+      "the figure needs an associated figcaption",
+    );
+  }
+}
+
+function contrastRatio(foreground, background) {
+  const relativeLuminance = (hex) => {
+    const channels = hex.slice(1).match(/../g).map((channel) => Number.parseInt(channel, 16) / 255);
+    const [red, green, blue] = channels.map((channel) => (
+      channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4
+    ));
+
+    return 0.2126 * red + 0.7152 * green + 0.0722 * blue;
+  };
+  const [lighter, darker] = [relativeLuminance(foreground), relativeLuminance(background)].sort((left, right) => right - left);
+
+  return (lighter + 0.05) / (darker + 0.05);
 }
 
 function walkJavaScript(node, visit) {
@@ -226,4 +331,35 @@ test("the static asset gate rejects relative sign-in links and alternate tracker
   assert.throws(() => assertNoUnapprovedStylesheetDestinations('@import url("https://plausible.io/css/site.css");'));
   assert.throws(() => assertNoUnapprovedStylesheetDestinations('.promo { background: url(//tracker.example/pixel.gif); }'));
   assert.throws(() => assertNoUnapprovedStylesheetDestinations("@import url(\\2f \\2f tracker.example/pixel.css);"));
+});
+
+test("public pages preserve accessible semantics and valid internal destinations", async () => {
+  const [homepage, notFoundPage] = await Promise.all(
+    ["../index.html", "../404.html"].map((path) => readFile(new URL(path, import.meta.url), "utf8")),
+  );
+
+  assertPermittedHtml(homepage);
+  assertPermittedHtml(notFoundPage, { allowedHrefs: ["/"] });
+  assertAccessibleDocument(homepage, { requiresFigure: true });
+  assertAccessibleDocument(notFoundPage);
+  assert.match(notFoundPage, /<a class="button not-found-home" href="\/">Go to Rill &amp; Pine<\/a>/);
+  assert.doesNotMatch(notFoundPage, /waitlist|tally\.so|sign-in|enroll|tracking|live|provider|production|rel="canonical"|property="og:|application\/ld\+json/i);
+});
+
+test("small crimson labels meet AA contrast on their dark card", async () => {
+  const stylesheet = await readFile(new URL("../styles.css", import.meta.url), "utf8");
+
+  assert.match(stylesheet, /--signal:\s*#f58b77;/);
+  assert.match(
+    stylesheet,
+    /\.not-found-eyebrow,\s*\.not-found-route\s*\{[^}]*color:\s*var\(--signal\);/s,
+  );
+  assert.ok(contrastRatio("#f58b77", "#174143") >= 4.5, "crimson labels must meet WCAG AA on pine light");
+});
+
+test("shared styles keep visible focus and reduced-motion support", async () => {
+  const stylesheet = await readFile(new URL("../styles.css", import.meta.url), "utf8");
+
+  assert.match(stylesheet, /:focus-visible\s*\{[^}]*outline:\s*3px solid var\(--brass\);/s);
+  assert.match(stylesheet, /@media \(prefers-reduced-motion: reduce\)\s*\{/);
 });

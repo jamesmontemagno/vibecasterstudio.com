@@ -7,7 +7,7 @@
   --mist: #d9e4de;
   --stone: #8fa49e;
   --brass: #edc874;
-  --signal: #f27c62;
+  --signal: #f58b77;
   --ink: #0f2526;
   --paper: #e9eee8;
   --paper-muted: #c5d0ca;
@@ -172,6 +172,7 @@ input:focus { border-color: var(--river); outline: none; }
 
 .hero-instrument {
   position: relative;
+  margin: 0;
   border: 1px solid rgba(185, 238, 227, 0.28);
   background: #0b292a;
   box-shadow: 18px 20px 0 rgba(0, 0, 0, 0.15);
@@ -370,6 +371,35 @@ details p { max-width: 60ch; margin: -0.2rem 0 1.4rem; color: var(--paper-muted)
 .site-footer { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 1rem; min-height: 115px; border-top: 1px solid var(--line); color: var(--stone); font-size: 0.76rem; }
 .site-footer > :last-child { justify-self: end; }
 
+.not-found-page {
+  display: grid;
+  min-height: calc(100vh - 207px);
+  place-items: center;
+  padding-block: clamp(4rem, 12vw, 9rem);
+}
+
+.not-found-card {
+  width: min(100%, 680px);
+  padding: clamp(2rem, 7vw, 5rem);
+  background: var(--pine-light);
+  box-shadow: 15px 16px 0 rgba(0, 0, 0, 0.14);
+}
+
+.not-found-eyebrow,
+.not-found-route {
+  margin: 0;
+  color: var(--signal);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.not-found-route { margin-top: 2rem; }
+.not-found-card h1 { max-width: 10ch; margin-top: 1rem; }
+.not-found-card > p:not(.not-found-eyebrow):not(.not-found-route) { max-width: 42ch; margin-bottom: 0; color: var(--river-pale); font-size: 1.05rem; line-height: 1.7; }
+.not-found-home { margin-top: 2rem; }
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -398,6 +428,7 @@ details p { max-width: 60ch; margin: -0.2rem 0 1.4rem; color: var(--paper-muted)
   .plain-section, .access-section { gap: 2rem; }
   .site-footer { grid-template-columns: 1fr 1fr; }
   .site-footer > p:nth-child(2) { display: none; }
+  .not-found-page { min-height: auto; }
 }
 
 @media (max-width: 580px) {
@@ -432,6 +463,7 @@ details p { max-width: 60ch; margin: -0.2rem 0 1.4rem; color: var(--paper-muted)
   .access-section { margin-bottom: 3rem; padding: 2rem 1.4rem; }
   .site-footer { min-height: 90px; }
   .site-footer > :last-child { font-size: 0.68rem; }
+  .not-found-card { padding: 2rem 1.4rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {
