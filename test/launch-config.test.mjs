@@ -50,12 +50,17 @@ const URL_ATTRIBUTES = new Set([
 const EMBEDDED_DOCUMENT_ELEMENTS = new Set(["embed", "frame", "iframe", "object", "portal"]);
 const ALLOWED_MEMBER_CALLS = new Set([
   "addEventListener",
+  "DateTimeFormat",
+  "exec",
+  "format",
   "freeze",
   "getFullYear",
   "getTime",
   "isFinite",
+  "map",
   "querySelector",
   "setAttribute",
+  "slice",
   "test",
   "toISOString",
   "toggle",
@@ -145,6 +150,7 @@ function assertNoClientNavigation(executableAssets) {
 
   walkJavaScript(program, (node) => {
     assert.equal(node.type === "ImportDeclaration" || node.type === "ImportExpression", false, "module imports are not allowed");
+    assert.notEqual(node.type, "NewExpression", "constructors are not allowed in served scripts");
 
     if (node.type === "CallExpression" && node.callee.type === "MemberExpression") {
       const property = memberPropertyName(node.callee);
@@ -214,6 +220,7 @@ test("the static asset gate rejects relative sign-in links and alternate tracker
   assert.throws(() => assertNoClientNavigation("window.open('/sign-in');"));
   assert.throws(() => assertNoClientNavigation("import './asset.js';"));
   assert.throws(() => assertNoClientNavigation("import('./asset.js');"));
+  assert.throws(() => assertNoClientNavigation("new Function(\"location.assign('/sign-in')\")();"));
   assert.throws(() => assertNoUnapprovedStylesheetDestinations('@import url("https://plausible.io/css/site.css");'));
   assert.throws(() => assertNoUnapprovedStylesheetDestinations('.promo { background: url(//tracker.example/pixel.gif); }'));
   assert.throws(() => assertNoUnapprovedStylesheetDestinations("@import url(\\2f \\2f tracker.example/pixel.css);"));

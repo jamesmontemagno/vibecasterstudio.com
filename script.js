@@ -14,4 +14,4 @@ conditionToggle?.addEventListener("click", () => {
   waterValue.textContent = isRough ? "03.8" : "01.4";
 });
 
-document.querySelector("#year").textContent = new Date().getFullYear();
+document.querySelector("#year").textContent = Intl.DateTimeFormat(undefined, { year: "numeric" }).format();
