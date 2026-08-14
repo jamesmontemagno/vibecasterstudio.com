@@ -47,6 +47,19 @@ const URL_ATTRIBUTES = new Set([
   "srcset",
   "xlink:href",
 ]);
+const EMBEDDED_DOCUMENT_ELEMENTS = new Set(["embed", "frame", "iframe", "object", "portal"]);
+const ALLOWED_MEMBER_CALLS = new Set([
+  "addEventListener",
+  "freeze",
+  "getFullYear",
+  "getTime",
+  "isFinite",
+  "querySelector",
+  "setAttribute",
+  "test",
+  "toISOString",
+  "toggle",
+]);
 
 function walkHtml(node, visit) {
   visit(node);
@@ -68,9 +81,12 @@ function assertPermittedHtml(page) {
 
     assert.notEqual(tagName, "base", "base elements can redirect otherwise local links");
     assert.notEqual(tagName, "form", "the static site must not create forms");
+    assert.equal(EMBEDDED_DOCUMENT_ELEMENTS.has(tagName), false, `embedded documents are not allowed: ${tagName}`);
+    assert.notEqual(tagName, "style", "inline styles are not allowed");
 
     if (tagName === "script") {
       assert.equal(attributes.get("src"), "script.js", "only the local application script is allowed");
+      assert.equal(attributes.has("type"), false, "module scripts are not allowed");
     }
 
     if (tagName === "meta" && attributes.get("http-equiv")?.toLowerCase() === "refresh") {
@@ -79,6 +95,8 @@ function assertPermittedHtml(page) {
 
     for (const [name, value] of attributes) {
       assert.equal(name.startsWith("on"), false, `inline event handler is not allowed: ${name}`);
+      assert.notEqual(name, "srcdoc", "embedded document content is not allowed");
+      assert.notEqual(name, "style", "style attributes are not allowed");
 
       if (!URL_ATTRIBUTES.has(name)) {
         continue;
@@ -126,6 +144,8 @@ function assertNoClientNavigation(executableAssets) {
   const program = parseJavaScript(executableAssets, { ecmaVersion: "latest", sourceType: "module" });
 
   walkJavaScript(program, (node) => {
+    assert.equal(node.type === "ImportDeclaration" || node.type === "ImportExpression", false, "module imports are not allowed");
+
     if (node.type === "CallExpression" && node.callee.type === "MemberExpression") {
       const property = memberPropertyName(node.callee);
       assert.equal(node.callee.computed, false, "computed method calls are not allowed in served scripts");
@@ -136,7 +156,11 @@ function assertNoClientNavigation(executableAssets) {
         return;
       }
 
-      assert.equal(["assign", "createElement", "replace", "requestSubmit", "submit"].includes(property), false);
+      assert.equal(ALLOWED_MEMBER_CALLS.has(property), true, `unapproved method call: ${property}`);
+    }
+
+    if (node.type === "CallExpression" && node.callee.type === "Identifier") {
+      assert.equal(node.callee.name, "String", `unapproved function call: ${node.callee.name}`);
     }
 
     if (node.type === "AssignmentExpression" && node.left.type === "MemberExpression") {
@@ -180,10 +204,16 @@ test("the static asset gate rejects relative sign-in links and alternate tracker
   assert.throws(() => assertPermittedHtml(`${page}<a href = "/sign-in">Sign in</a>`));
   assert.throws(() => assertPermittedHtml(`${page}<form action=/sign-in></form>`));
   assert.throws(() => assertPermittedHtml(`${page}<button formaction="/sign-in">Sign in</button>`));
+  assert.throws(() => assertPermittedHtml(`${page}<iframe srcdoc="<a href='/sign-in'>Sign in</a>"></iframe>`));
+  assert.throws(() => assertPermittedHtml(`${page}<style>@import url(\\2f \\2f tracker.example/pixel.css);</style>`));
+  assert.throws(() => assertPermittedHtml(`${page}<div style="background: url(//tracker.example/pixel.gif)"></div>`));
   assert.throws(() => assertNoUnapprovedDestinations('<script src="https://plausible.io/js/script.js"></script>'));
   assert.throws(() => assertNoClientNavigation('document["createElement"]("form");'));
   assert.throws(() => assertNoClientNavigation('form["action"] = "/sign-in";'));
   assert.throws(() => assertNoClientNavigation("form.submit();"));
+  assert.throws(() => assertNoClientNavigation("window.open('/sign-in');"));
+  assert.throws(() => assertNoClientNavigation("import './asset.js';"));
+  assert.throws(() => assertNoClientNavigation("import('./asset.js');"));
   assert.throws(() => assertNoUnapprovedStylesheetDestinations('@import url("https://plausible.io/css/site.css");'));
   assert.throws(() => assertNoUnapprovedStylesheetDestinations('.promo { background: url(//tracker.example/pixel.gif); }'));
   assert.throws(() => assertNoUnapprovedStylesheetDestinations("@import url(\\2f \\2f tracker.example/pixel.css);"));
