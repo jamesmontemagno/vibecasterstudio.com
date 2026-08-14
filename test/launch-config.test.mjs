@@ -15,6 +15,8 @@ test("verification timestamps must be canonical UTC RFC3339 values", () => {
 test("normalized, date-only, and non-UTC verification timestamps are rejected", () => {
   const invalidTimestamps = [
     "2026-02-30T00:00:00.000Z",
+    "+010000-01-01T00:00:00.000Z",
+    "-000001-01-01T00:00:00.000Z",
     "2026-08-13",
     "2026-08-13T00:00:00",
     "2026-08-13T00:00:00+00:00",
@@ -27,16 +29,54 @@ test("normalized, date-only, and non-UTC verification timestamps are rejected", 
   }
 });
 
+function assertPermittedUrlAttributes(page) {
+  const urlAttributes = [...page.matchAll(/\b(href|src|action)=(["'])(.*?)\2/gi)].map(([, name, , value]) => ({
+    name: name.toLowerCase(),
+    value,
+  }));
+
+  for (const { name, value } of urlAttributes) {
+    if (name === "href") {
+      assert.ok(value === "styles.css" || value.startsWith("#"), `unapproved href: ${value}`);
+      continue;
+    }
+
+    assert.equal(name, "src");
+    assert.equal(value, "script.js");
+  }
+}
+
+function assertNoClientNavigation(executableAssets) {
+  assert.doesNotMatch(
+    executableAssets,
+    /(?:window\.)?location(?:\.\w+)?|history\.(?:pushState|replaceState)|document\.createElement\(\s*["'](?:a|script)["']/i,
+  );
+}
+
+function assertNoUnapprovedDestinations(servedAssets) {
+  assert.doesNotMatch(servedAssets, /https?:\/\/|tally\.so|plausible|google-analytics|googletagmanager/i);
+}
+
 test("served assets have no enrollment provider, sign-in route, tracking, or launch claims", async () => {
   const [page, script, config] = await Promise.all(
     ["../index.html", "../script.js", "../launch-config.js"].map((path) => readFile(new URL(path, import.meta.url), "utf8")),
   );
   const servedAssets = `${page}\n${script}\n${config}`;
 
-  assert.doesNotMatch(servedAssets, /tally\.so|waitlist|join the waitlist|google-analytics|googletagmanager/i);
+  assertPermittedUrlAttributes(page);
+  assertNoClientNavigation(`${script}\n${config}`);
+  assertNoUnapprovedDestinations(servedAssets);
+  assert.doesNotMatch(servedAssets, /waitlist|join the waitlist/i);
   assert.doesNotMatch(servedAssets, /invited hosts: sign in|https:\/\/app\.vibecasterstudio\.com/i);
   assert.doesNotMatch(servedAssets, /production-ready|provider-backed|compliant|available to everyone/i);
   assert.doesNotMatch(page, /rel="canonical"|property="og:|application\/ld\+json/i);
   assert.doesNotMatch(page, /<a[^>]+href="https?:\/\//i);
   assert.match(page, /Invited-host sign-in is not enabled on this page\./);
+});
+
+test("the static asset gate rejects relative sign-in links and alternate trackers", async () => {
+  const page = await readFile(new URL("../index.html", import.meta.url), "utf8");
+
+  assert.throws(() => assertPermittedUrlAttributes(`${page}<a href="/sign-in">Sign in</a>`));
+  assert.throws(() => assertNoUnapprovedDestinations('<script src="https://plausible.io/js/script.js"></script>'));
 });
