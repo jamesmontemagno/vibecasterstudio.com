@@ -1,0 +1,12 @@
+{
+  "name": "rill-and-pine-launch-site",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "acorn": "^8.15.0",
+    "parse5": "^8.0.0"
+  },
+  "scripts": {
+    "test": "node --test"
+  }
+}
