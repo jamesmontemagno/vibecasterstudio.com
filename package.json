@@ -1,0 +1,8 @@
+{
+  "name": "rill-and-pine-launch-site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test"
+  }
+}
