@@ -73,7 +73,7 @@ function walkHtml(node, visit) {
   }
 }
 
-function assertPermittedHtml(page, { allowedHrefs = [] } = {}) {
+function assertPermittedHtml(page, { allowedHrefs = [], allowedStylesheetHrefs = [] } = {}) {
   const document = parseHtml(page);
 
   walkHtml(document, (node) => {
@@ -107,7 +107,14 @@ function assertPermittedHtml(page, { allowedHrefs = [] } = {}) {
         continue;
       }
 
-      if (name === "href" && (value === "styles.css" || value.startsWith("#") || allowedHrefs.includes(value))) {
+      if (
+        name === "href"
+        && (
+          (tagName === "link" && (value === "styles.css" || allowedStylesheetHrefs.includes(value)))
+          || value.startsWith("#")
+          || allowedHrefs.includes(value)
+        )
+      ) {
         continue;
       }
 
@@ -339,7 +346,7 @@ test("public pages preserve accessible semantics and valid internal destinations
   );
 
   assertPermittedHtml(homepage);
-  assertPermittedHtml(notFoundPage, { allowedHrefs: ["/"] });
+  assertPermittedHtml(notFoundPage, { allowedHrefs: ["/"], allowedStylesheetHrefs: ["/styles.css"] });
   assertAccessibleDocument(homepage, { requiresFigure: true });
   assertAccessibleDocument(notFoundPage);
   assert.match(notFoundPage, /<a class="button not-found-home" href="\/">Go to Rill &amp; Pine<\/a>/);
