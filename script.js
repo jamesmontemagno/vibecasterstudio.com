@@ -1,28 +1,9 @@
-import { getVerifiedSignInUrl, launchConfig } from "./launch-config.js";
-
 const conditionToggle = document.querySelector("#condition-toggle");
 const instrument = document.querySelector(".hero-instrument");
 const conditionLabel = document.querySelector("#condition-label");
 const connectionState = document.querySelector("#connection-state");
 const guestTrackState = document.querySelector("#guest-track-state");
 const waterValue = document.querySelector("#water-value");
-const signInUrl = getVerifiedSignInUrl(launchConfig);
-
-function renderInvitedHostAccess(container, className = "") {
-  if (!container || !signInUrl) {
-    return;
-  }
-
-  const signInLink = document.createElement("a");
-  signInLink.className = className;
-  signInLink.href = signInUrl;
-  signInLink.textContent = "Invited hosts: sign in";
-  container.replaceChildren(signInLink);
-}
-
-renderInvitedHostAccess(document.querySelector("#header-access"), "button button-small");
-renderInvitedHostAccess(document.querySelector("#primary-access"), "button hero-button");
-
 conditionToggle?.addEventListener("click", () => {
   const isRough = instrument.classList.toggle("is-rough");
   conditionToggle.setAttribute("aria-pressed", String(isRough));

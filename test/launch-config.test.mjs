@@ -1,68 +1,42 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
-import { getVerifiedSignInUrl, launchConfig } from "../launch-config.js";
-
-const now = new Date("2026-08-14T00:00:00.000Z");
-
-function verifiedConfig(overrides = {}) {
-  return {
-    invitedHostSignIn: {
-      enabled: true,
-      url: "https://app.vibecasterstudio.com",
-      verification: {
-        publicFactsApproval: "marketing-approval-123",
-        releaseEvidenceReference: "release-gate-456",
-        routeVerifiedAt: "2026-08-13T00:00:00.000Z",
-        verifiedRoute: "https://app.vibecasterstudio.com/",
-      },
-      ...overrides,
-    },
-  };
-}
+import { isCanonicalUtcRfc3339, launchConfig } from "../launch-config.js";
 
 test("the committed launch configuration fails closed", () => {
-  assert.equal(getVerifiedSignInUrl(launchConfig, now), null);
+  assert.equal(launchConfig.invitedHostAccess.state, "unavailable");
+  assert.equal(launchConfig.publicMetadata.enabled, false);
 });
 
-test("a verified invited-host route is the only allowed sign-in destination", () => {
-  assert.equal(getVerifiedSignInUrl(verifiedConfig(), now), "https://app.vibecasterstudio.com/");
+test("verification timestamps must be canonical UTC RFC3339 values", () => {
+  assert.equal(isCanonicalUtcRfc3339("2026-08-13T00:00:00.123Z"), true);
 });
 
-test("invalid, unverified, or stale route configurations do not render a sign-in link", () => {
-  const cases = [
-    verifiedConfig({ url: "http://app.vibecasterstudio.com" }),
-    verifiedConfig({ url: "https://example.com" }),
-    verifiedConfig({ url: "https://app.vibecasterstudio.com/login" }),
-    verifiedConfig({
-      verification: {
-        publicFactsApproval: "",
-        releaseEvidenceReference: "release-gate-456",
-        routeVerifiedAt: "2026-08-13T00:00:00.000Z",
-        verifiedRoute: "https://app.vibecasterstudio.com/",
-      },
-    }),
-    verifiedConfig({
-      verification: {
-        publicFactsApproval: "marketing-approval-123",
-        releaseEvidenceReference: "release-gate-456",
-        routeVerifiedAt: "2026-08-01T00:00:00.000Z",
-        verifiedRoute: "https://app.vibecasterstudio.com/",
-      },
-    }),
+test("normalized, date-only, and non-UTC verification timestamps are rejected", () => {
+  const invalidTimestamps = [
+    "2026-02-30T00:00:00.000Z",
+    "2026-08-13",
+    "2026-08-13T00:00:00",
+    "2026-08-13T00:00:00+00:00",
+    "2026-08-13T00:00:00Z",
+    "not-a-timestamp",
   ];
 
-  for (const config of cases) {
-    assert.equal(getVerifiedSignInUrl(config, now), null);
+  for (const timestamp of invalidTimestamps) {
+    assert.equal(isCanonicalUtcRfc3339(timestamp), false);
   }
 });
 
-test("the static page has no enrollment provider, public signup, analytics, or launch claims", async () => {
-  const page = await readFile(new URL("../index.html", import.meta.url), "utf8");
+test("served assets have no enrollment provider, sign-in route, tracking, or launch claims", async () => {
+  const [page, script, config] = await Promise.all(
+    ["../index.html", "../script.js", "../launch-config.js"].map((path) => readFile(new URL(path, import.meta.url), "utf8")),
+  );
+  const servedAssets = `${page}\n${script}\n${config}`;
 
-  assert.doesNotMatch(page, /tally\.so|waitlist|join the waitlist|google-analytics|googletagmanager/i);
-  assert.doesNotMatch(page, /production-ready|provider-backed|compliant|available to everyone/i);
+  assert.doesNotMatch(servedAssets, /tally\.so|waitlist|join the waitlist|google-analytics|googletagmanager/i);
+  assert.doesNotMatch(servedAssets, /invited hosts: sign in|https:\/\/app\.vibecasterstudio\.com/i);
+  assert.doesNotMatch(servedAssets, /production-ready|provider-backed|compliant|available to everyone/i);
   assert.doesNotMatch(page, /rel="canonical"|property="og:|application\/ld\+json/i);
-  assert.match(page, /id="header-access"/);
-  assert.match(page, /id="primary-access"/);
+  assert.doesNotMatch(page, /<a[^>]+href="https?:\/\//i);
+  assert.match(page, /Invited-host sign-in is not enabled on this page\./);
 });

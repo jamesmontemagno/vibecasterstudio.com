@@ -169,7 +169,6 @@ input {
 input::placeholder { color: #acc0ba; opacity: 1; }
 input:focus { border-color: var(--river); outline: none; }
 .form-note { margin: 0.7rem 0 0; color: var(--stone); font-size: 0.77rem; }
-.primary-access .button { margin-top: 2.3rem; }
 
 .hero-instrument {
   position: relative;
