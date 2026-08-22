@@ -8,7 +8,7 @@ colors:
   river: "#76d2c2"
   river-pale: "#b9eee3"
   brass: "#edc874"
-  signal: "#f27c62"
+  signal: "#f58b77"
   paper: "#e9eee8"
   paper-muted: "#c5d0ca"
   stone: "#8fa49e"

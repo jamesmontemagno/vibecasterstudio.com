@@ -1,26 +1,40 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
-  <title id="title">VibeCaster Studio</title>
-  <desc id="desc">Remote recording that keeps the take</desc>
-  <rect width="1200" height="630" fill="white"/>
-  <circle cx="1050" cy="92" r="180" fill="oklch(0.93 0.055 27)"/>
-  <circle cx="1095" cy="590" r="170" fill="oklch(0.93 0.06 181)"/>
-  <circle cx="890" cy="515" r="84" fill="oklch(0.82 0.15 84)"/>
-  <g transform="translate(76 74)">
-    <circle cx="34" cy="34" r="32" fill="oklch(0.614 0.234 28.2)"/>
-    <path d="M19 30v8M29 21v26M39 27v14M49 17v34" fill="none" stroke="white" stroke-width="6" stroke-linecap="round"/>
-    <text x="86" y="45" fill="oklch(0.19 0.025 25)" font-family="Helvetica, sans-serif" font-size="34" font-weight="800">VibeCaster Studio</text>
+  <title id="title">Rill &amp; Pine</title>
+  <desc id="desc">The recording keeps going. So does the conversation.</desc>
+  <rect width="1200" height="630" fill="#071b1c"/>
+  <rect x="40" y="40" width="1120" height="550" fill="#0c2b2c" stroke="rgba(185, 238, 227, 0.28)" stroke-width="2"/>
+
+  <!-- Brand -->
+  <g transform="translate(92 88)">
+    <g fill="none" stroke="#e9eee8" stroke-width="3.2" stroke-linecap="round" transform="scale(1.5)">
+      <path d="M5 30.5c6.2-2.2 10.6-6.5 13.2-13C20.3 11.2 25 8 30.8 5.5"/>
+      <path d="M9 35.5c7.4-1.9 13.1-5.1 17-9.7 4.4-5.1 7.4-10.8 12.1-14.1"/>
+      <path d="M6 39.1c8.4-1.3 15.1-4.2 20.1-8.6 5.6-4.9 8.8-9.9 13-11.5"/>
+    </g>
+    <text x="84" y="46" fill="#e9eee8" font-family="Avenir Next, Avenir, Helvetica Neue, Segoe UI, Helvetica, Arial, sans-serif" font-size="38" font-weight="600" letter-spacing="-0.5">Rill <tspan fill="#edc874" font-weight="400">&amp;</tspan> Pine</text>
   </g>
-  <text x="76" y="250" fill="oklch(0.19 0.025 25)" font-family="Helvetica, sans-serif" font-size="78" font-weight="900" letter-spacing="-3">
-    <tspan x="76" dy="0">Remote recording</tspan>
-    <tspan x="76" dy="88">that keeps the take.</tspan>
+
+  <!-- Eyebrow -->
+  <g transform="translate(92 214)" fill="#f58b77" font-family="Avenir Next, Avenir, Helvetica Neue, Segoe UI, Helvetica, Arial, sans-serif" font-size="20" font-weight="700" letter-spacing="3">
+    <rect x="0" y="-6" width="52" height="2" fill="#f58b77"/>
+    <text x="68" y="2">REMOTE RECORDING, WEATHER-READY</text>
+  </g>
+
+  <!-- Headline -->
+  <text x="92" y="330" fill="#e9eee8" font-family="Avenir Next, Avenir, Helvetica Neue, Segoe UI, Helvetica, Arial, sans-serif" font-size="76" font-weight="600" letter-spacing="-2.5">
+    <tspan x="92" dy="0">The recording keeps going.</tspan>
+    <tspan x="92" dy="86">So does the conversation.</tspan>
   </text>
-  <text x="80" y="486" fill="oklch(0.43 0.035 25)" font-family="Helvetica, sans-serif" font-size="30">
-    Local capture · Resilient backup · Flexible export
+
+  <!-- Supporting line -->
+  <text x="92" y="496" fill="#b9eee3" font-family="Avenir Next, Avenir, Helvetica Neue, Segoe UI, Helvetica, Arial, sans-serif" font-size="28">
+    A calm, dependable place to record remote podcast conversations.
   </text>
-  <g transform="translate(762 182)">
-    <path d="M0 126C72 126 73 54 142 54S216 126 286 126" fill="none" stroke="oklch(0.614 0.234 28.2)" stroke-width="10" stroke-linecap="round" stroke-dasharray="14 20"/>
-    <circle cx="0" cy="126" r="38" fill="oklch(0.614 0.234 28.2)" stroke="oklch(0.19 0.025 25)" stroke-width="6"/>
-    <circle cx="142" cy="54" r="42" fill="oklch(0.72 0.13 181)" stroke="oklch(0.19 0.025 25)" stroke-width="6"/>
-    <rect x="246" y="87" width="80" height="78" rx="16" fill="oklch(0.82 0.15 84)" stroke="oklch(0.19 0.025 25)" stroke-width="6"/>
+
+  <!-- Footer: domain + status -->
+  <g font-family="Avenir Next, Avenir, Helvetica Neue, Segoe UI, Helvetica, Arial, sans-serif" font-size="20" font-weight="600" letter-spacing="2">
+    <text x="92" y="556" fill="#8fa49e">RILLANDPINE.COM</text>
+    <circle cx="900" cy="549" r="6" fill="#f58b77"/>
+    <text x="918" y="556" fill="#8fa49e">RECORDING LOCALLY</text>
   </g>
 </svg>

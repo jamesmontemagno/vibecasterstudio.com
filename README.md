@@ -1,8 +1,8 @@
-# VibeCaster Studio
+# Rill & Pine
 
-The public coming-soon site for [vibecasterstudio.com](https://vibecasterstudio.com).
+The public coming-soon site for [rillandpine.com](https://rillandpine.com).
 
-VibeCaster Studio is a browser-based remote audio and video podcast recording studio for independent podcasters and small creator teams. This repository contains a dependency-free static site designed for GitHub Pages.
+Rill & Pine is a calm, dependable place to record remote podcast conversations. It is built for independent podcast hosts: when a guest's internet connection gets rough, local recording holds the take. This repository contains the dependency-free static marketing site, published on GitHub Pages.
 
 ## Local preview
 
@@ -16,13 +16,25 @@ Then open <http://localhost:8080>.
 
 ## Structure
 
-- `index.html` — semantic page content and original inline signal-map artwork
+- `index.html` — semantic page content, social/SEO metadata, the illustrative session instrument, and the Tally waitlist embed
 - `styles.css` — responsive design system, layout, and reduced-motion support
+- `script.js` — the "simulate rough weather" condition toggle and footer year
+- `404.html` — custom not-found page
 - `assets/` — favicon and social sharing artwork
 - `PRODUCT.md` — public product and brand context
 - `DESIGN.md` — public visual system and implementation guidance
 - `CNAME` — canonical GitHub Pages custom domain
+- `test/` — static site checks (metadata, accessibility, allowed destinations)
+
+## Quality checks
+
+```sh
+npm ci
+npm test
+```
+
+The same checks run in GitHub Actions on pull requests and pushes to `main`.
 
 ## Deployment
 
-GitHub Pages publishes from the root of the `main` branch. The canonical domain is `vibecasterstudio.com`.
+GitHub Pages publishes from the root of the `main` branch. The canonical domain is `rillandpine.com`.
